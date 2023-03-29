@@ -8,6 +8,8 @@ const {
 } = require('./helpers/fsUtils');
 
 app.use(express.static('public'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/notes', (req, res) =>
   res.sendFile(path.join(__dirname, '/public/notes.html'))
@@ -26,14 +28,13 @@ app.post('/api/notes', (req, res) => {
       notes.push(newNote);
       return notes;
     })
-    .then((updatedNotes) => writeToFile('./db/db.json', JSON.stringify(updatedNotes)))
+    .then((updatedNotes) => writeToFile('./db/db.json', updatedNotes))
     .then(() => res.json(newNote))
     .catch((err) => {
       console.error(err);
       res.status(500).json({ error: 'Failed to save note' });
     });
 });
-
 
 app.get('*', (req, res) =>
   res.sendFile(path.join(__dirname, 'public/index.html'))
